@@ -17,5 +17,12 @@ p=(await request(url,'PATCH',{action:'approve',taskId:task})).data;assert.equal(
 p=(await request(url,'PATCH',{mode:'auto',action:'answer',taskId:p.tasks[1].id,answer:'ตารางวัสดุและค่าแรง'})).data;assert.equal(p.tasks[2].role,'engineer');assert.equal(p.tasks[1].status,'อนุมัติแล้ว');
 assert.equal((await request(url,'PATCH',{action:'answer',taskId:task,answer:'แก้คำตอบที่อนุมัติแล้ว'})).status,400);
 const f=await request(url+'/files','POST','sample pdf',{'X-File-Name':encodeURIComponent('แบบบ้าน.pdf')});assert.equal(f.status,201);const bytes=await fetch(s.base+'/api/files/'+f.data.id,{headers:{'X-Office-Password':'test-password'}});assert.equal(await bytes.text(),'sample pdf');assert.equal((await request(url+'/files','POST','bad',{'X-File-Name':'bad.exe'})).status,400);
+const second=(await request('/api/projects','POST',{name:'งานสายป่าน'})).data;
+const secondUrl='/api/projects/'+second.id;
+let saipan=(await request(secondUrl,'PATCH',{action:'task',role:'architect_saipan',text:'ออกแบบบ้านอีกทางเลือก'})).data;
+assert.equal(saipan.tasks[0].role,'architect_saipan');
+saipan=(await request(secondUrl,'PATCH',{mode:'auto',action:'answer',taskId:saipan.tasks[0].id,answer:'แบบจากสายป่าน'})).data;
+assert.equal(saipan.stage,1);assert.equal(saipan.tasks[1].role,'draft');assert.equal(saipan.tasks.length,2);
+assert.equal((await request('/api/state')).data.projects[0].tasks.length,3);
 await stop(s.child);s=await start(dir);const persisted=(await request('/api/state')).data.projects[0];assert.equal(persisted.tasks.length,3);assert.equal(persisted.files.length,1);assert.equal(persisted.tasks[0].answer,'ผังแนวคิด');
 }finally{await stop(s.child);await rm(dir,{recursive:true,force:true});}});

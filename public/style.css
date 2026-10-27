@@ -23,3 +23,6 @@
 .sunlight{background:repeating-linear-gradient(90deg,#e8f4ff30 0 100px,transparent 101px 115px)}.cabinet{--top:#c4ae88;--front:repeating-linear-gradient(90deg,#7b674c 0 67px,#3b4d5f 68px 70px);--side:#66563e}.chair,.chair-back{--top:#406184;--front:#2c4969;--side:#1c334f}
 .room-team .person{background:#203b59;border-color:#42607c;box-shadow:0 4px 0 #0b1c30;color:#f0f4f8}.room-team .person small{color:#acc3da}.room-team .person em{background:#102b44;color:#c6dcf0}.room-team .person:hover,.room-team .person:focus-visible{background:#2d4e71;outline-color:#97c2e7}.room-tip{color:#9bb4cf}
 .workstation{pointer-events:auto;cursor:pointer}.workstation:focus-visible{outline:3px solid #c7e6ff;outline-offset:10px}.workstation:hover .desk-top{--top:#e3c697}.workstation:hover .station-shadow{background:#9cbfdb55}
+/* Four independent teammates; both architects share the design workflow. */
+.room-team{grid-template-columns:repeat(4,minmax(0,1fr))}.body.saipan{--top:#a9c7dd;--front:#719dbf;--side:#517c9e}.head.saipan{--top:#51382f;--side:linear-gradient(90deg,#654237 35%,#d7a983 35%)}.head.saipan:before,.head.saipan:after{background:#634238;height:39px}
+@media(max-width:650px){.room-team{grid-template-columns:repeat(2,minmax(0,1fr))}.steps{flex-wrap:wrap}.room-team .person strong{font-size:12px}.room-team .person small{font-size:10px}}
