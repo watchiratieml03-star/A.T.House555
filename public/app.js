@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 let password=sessionStorage.getItem('officePassword')||'',state={projects:[]},current=null,filter='all',selectedTask=null;
-const names={architect:'มิน · สถาปนิก',draft:'ต้น · ดราฟแมน',engineer:'ภาค · วิศวกร'};
+const names={architect:'พลอย · สถาปนิก',draft:'บาส · ดราฟแมน',engineer:'โฟ๊ก · วิศวกร'};
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let toastTimer;function toast(s){$('#toast').textContent=s;$('#toast').style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').style.display='none',4500);}
 async function api(url,options={}){const res=await fetch(url,{...options,headers:{'X-Office-Password':password,...options.headers}});const data=await res.json();if(!res.ok)throw Error(data.error||'ทำรายการไม่สำเร็จ');return data;}
@@ -29,3 +29,16 @@ $('#exportPlan').onclick=()=>download(planSvg(project().house),'house-concept.sv
 function renderFiles(){$('#fileList').innerHTML=project().files.map(f=>`<div class="file-row"><span>▤ ${escape(f.name)} <small>(${(f.size/1024).toFixed(1)} KB)</small></span><button data-file="${f.id}">ดาวน์โหลด</button></div>`).join('')||'<p class="hint">ยังไม่มีไฟล์แนบ</p>';$$('[data-file]').forEach(b=>b.onclick=()=>run(async()=>{const f=project().files.find(f=>f.id===b.dataset.file);const res=await fetch('/api/files/'+f.id,{headers:{'X-Office-Password':password}});if(!res.ok)throw Error('ดาวน์โหลดไม่สำเร็จ');download(await res.blob(),f.name,'application/octet-stream');}));}
 $('#upload').onchange=e=>run(async()=>{const input=e.target;input.disabled=true;try{for(const f of input.files){if(f.size>20*1024*1024)throw Error('ไฟล์ '+f.name+' ใหญ่เกิน 20 MB');const result=await api('/api/projects/'+current+'/files',{method:'POST',headers:{'X-File-Name':encodeURIComponent(f.name)},body:f});project().files.push(result);renderFiles();}toast('แนบไฟล์แล้ว');}finally{input.value='';input.disabled=false;}});
 if(password)login().catch(()=>{sessionStorage.removeItem('officePassword');});
+
+// Fit the same 3D room to desktop and phone without changing its geometry.
+const roomViewport=$('.room-viewport');
+function fitRoom(){const scale=Math.min(roomViewport.clientWidth/1100,roomViewport.clientHeight/640);$('.room-scale').style.setProperty('--room-scale',scale);}
+new ResizeObserver(fitRoom).observe(roomViewport);
+$('#roomAngle').addEventListener('input',e=>$('.room-scene').style.setProperty('--room-angle',e.target.value+'deg'));
+fitRoom();
+
+$$('[data-station]').forEach(station=>{
+ const open=()=>document.querySelector('.person[data-role="'+station.dataset.station+'"]').click();
+ station.addEventListener('click',open);
+ station.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+});
